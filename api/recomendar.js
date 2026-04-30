@@ -1,43 +1,26 @@
 export default async function handler(req, res) {
   // ===== CORS =====
-  res.setHeader(
-    'Access-Control-Allow-Origin',
-    process.env.ALLOWED_ORIGIN || '*'
-  );
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'POST, OPTIONS'
-  );
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'Content-Type'
-  );
+  res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method !== 'POST') {
-    return res.status(405).json({
-      error: 'Método não permitido'
-    });
+    return res.status(405).json({ error: 'Método não permitido' });
   }
 
-  // ===== Validação de dados =====
+  // ===== Validação =====
   const { humor, sentir, activities } = req.body || {};
 
   if (!humor || !sentir || !Array.isArray(activities) || activities.length === 0) {
-    return res.status(400).json({
-      error: 'Dados incompletos'
-    });
+    return res.status(400).json({ error: 'Dados incompletos' });
   }
 
   // ===== API KEY =====
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({
-      error: 'Chave de API do Gemini não configurada no servidor'
-    });
+    return res.status(500).json({ error: 'GEMINI_API_KEY não configurada' });
   }
 
   // ===== Prompt =====
@@ -49,108 +32,73 @@ Perfil do usuário:
 - Como quer se sentir: ${sentir}
 - Atividades de interesse: ${activities.join(', ')}
 
-Com base no seu conhecimento local, liste OS 4 MELHORES lugares reais e específicos em Fortaleza
-que combinem com esse perfil para visitar hoje ou em um dia comum.
+Liste OS 4 MELHORES lugares reais em Fortaleza que combinem com esse perfil.
 
-Responda SOMENTE com JSON válido, sem explicações extras, sem blocos de código:
-
+Responda SOMENTE com JSON válido:
 {
-  "titulo": "frase curta personalizada (máx 6 palavras)",
-  "subtitulo": "frase curta explicativa (1 linha)",
+  "titulo": "frase curta (máx 6 palavras)",
+  "subtitulo": "frase curta contextual",
   "lugares": [
     {
-      "nome": "Nome real do lugar em Fortaleza",
-      "tipo": "categoria (ex: Praia, Bar, Show, Parque)",
-      "icone": "emoji único",
-      "nota": 4.5,
-      "descricao": "2 frases explicando por que combina com o perfil.",
-      "tags": ["tag1", "tag2", "tag3"],
+      "nome": "Nome real do lugar",
+      "tipo": "Categoria",
+      "icone": "emoji",
+      "nota": 4.6,
+      "descricao": "2 frases explicativas.",
+      "tags": ["tag1","tag2"],
       "destaque": true
     }
   ]
 }
 
-Apenas o PRIMEIRO lugar deve ter "destaque": true.
-Os demais devem ter false.
+Apenas o primeiro lugar tem destaque true.
 `;
 
   try {
-    // ===== Chamada ao Gemini =====
+    // ✅ API V1 (CORRETA)
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: prompt }]
-            }
-          ],
+          contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 1200,
-            responseMimeType: 'application/json'
+            maxOutputTokens: 1200
           }
         })
       }
     );
 
     if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
+      const error = await response.json().catch(() => ({}));
       return res.status(response.status).json({
-        error: err.error?.message || 'Erro na API do Gemini'
+        error: error.error?.message || 'Erro na API do Gemini'
       });
     }
 
-    // ===== Processamento da resposta =====
     const data = await response.json();
-
-    const rawText =
+    const raw =
       data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    if (!rawText) {
-      return res.status(500).json({
-        error: 'Resposta vazia da IA'
-      });
+    if (!raw) {
+      return res.status(500).json({ error: 'Resposta vazia da IA' });
     }
 
-    // Remove possíveis blocos ```json
-    const cleaned = rawText
-      .replace(/```json/gi, '')
-      .replace(/```/g, '')
-      .trim();
-
-    const start = cleaned.indexOf('{');
-    const end = cleaned.lastIndexOf('}');
+    const clean = raw.replace(/```json|```/gi, '').trim();
+    const start = clean.indexOf('{');
+    const end = clean.lastIndexOf('}');
 
     if (start === -1 || end === -1) {
-      return res.status(500).json({
-        error: 'Formato inválido retornado pela IA'
-      });
+      return res.status(500).json({ error: 'JSON inválido retornado pela IA' });
     }
 
-    const jsonString = cleaned.slice(start, end + 1);
-
-    let result;
-    try {
-      result = JSON.parse(jsonString);
-    } catch (e) {
-      console.error('Erro ao fazer parse do JSON:', jsonString);
-      return res.status(500).json({
-        error: 'Erro ao interpretar resposta da IA'
-      });
-    }
-
-    // ===== Sucesso =====
+    const result = JSON.parse(clean.slice(start, end + 1));
     return res.status(200).json(result);
 
   } catch (err) {
-    console.error('Erro interno:', err);
-    return res.status(500).json({
-      error: 'Erro interno no servidor'
-    });
+    console.error(err);
+    return res.status(500).json({ error: 'Erro interno no servidor' });
   }
 }
