@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -47,212 +46,60 @@
     }
   }
 
-  html, body {
-    min-height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-  }
+  html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
 
-  .app {
-    max-width: 480px;
-    margin: 0 auto;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg);
-  }
+  .app { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
 
-  .header {
-    background: linear-gradient(135deg, #FF6B35 0%, #F7931E 55%, #FFD23F 100%);
-    padding: 28px 28px 24px;
-    position: relative;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-  .header::before {
-    content: '';
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 140px; height: 140px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.12);
-  }
-  .header::after {
-    content: '';
-    position: absolute;
-    bottom: -25px; left: 38%;
-    width: 90px; height: 90px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.08);
-  }
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-size: 24px;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: -0.5px;
-    position: relative;
-    z-index: 1;
-  }
+  .header { background: linear-gradient(135deg, #FF6B35 0%, #F7931E 55%, #FFD23F 100%); padding: 28px 28px 24px; position: relative; overflow: hidden; flex-shrink: 0; }
+  .header::before { content: ''; position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,0.12); }
+  .header::after { content: ''; position: absolute; bottom: -25px; left: 38%; width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,0.08); }
+  .logo { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px; position: relative; z-index: 1; }
   .logo span { opacity: 0.65; }
-  .tagline {
-    font-size: 12px;
-    color: rgba(255,255,255,0.88);
-    margin-top: 3px;
-    font-weight: 300;
-    letter-spacing: 0.5px;
-    position: relative;
-    z-index: 1;
-  }
+  .tagline { font-size: 12px; color: rgba(255,255,255,0.88); margin-top: 3px; font-weight: 300; letter-spacing: 0.5px; position: relative; z-index: 1; }
 
   .content { padding: 24px 24px 32px; flex: 1; }
 
-  .progress-bar {
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    margin-bottom: 26px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--orange), var(--yellow));
-    border-radius: 2px;
-    transition: width 0.45s cubic-bezier(.4,0,.2,1);
-    width: 0%;
-  }
+  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 26px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--orange), var(--yellow)); border-radius: 2px; transition: width 0.45s cubic-bezier(.4,0,.2,1); width: 0%; }
 
   .step { display: none; animation: fadeIn 0.3s ease; }
   .step.active { display: block; }
   @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-  .step-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    margin-bottom: 8px;
-  }
-  .question {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1.2;
-    margin-bottom: 22px;
-  }
+  .step-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; }
+  .question { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); line-height: 1.2; margin-bottom: 22px; }
 
-  .options-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 22px;
-  }
-  .opt-btn {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 14px;
-    padding: 16px 10px 14px;
-    cursor: pointer;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 7px;
-    transition: border-color 0.15s, background 0.15s, transform 0.1s;
-    -webkit-tap-highlight-color: transparent;
-  }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+  .opt-btn { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 16px 10px 14px; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 7px; transition: border-color 0.15s, background 0.15s, transform 0.1s; -webkit-tap-highlight-color: transparent; }
   .opt-btn:hover { border-color: var(--orange); background: rgba(255,107,53,0.07); }
   .opt-btn:active { transform: scale(0.97); }
   .opt-btn.selected { border-color: var(--orange); background: rgba(255,107,53,0.1); }
   .opt-icon { font-size: 26px; line-height: 1; }
   .opt-label { font-size: 12px; font-weight: 500; color: var(--text); line-height: 1.3; }
 
-  .next-btn {
-    width: 100%;
-    padding: 15px;
-    background: linear-gradient(135deg, var(--orange), var(--amber));
-    color: #fff;
-    border: none;
-    border-radius: 14px;
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-    letter-spacing: 0.3px;
-    -webkit-tap-highlight-color: transparent;
-  }
+  .next-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--orange), var(--amber)); color: #fff; border: none; border-radius: 14px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.2s, transform 0.1s; letter-spacing: 0.3px; -webkit-tap-highlight-color: transparent; }
   .next-btn:hover { opacity: 0.92; }
   .next-btn:active { transform: scale(0.99); }
   .next-btn:disabled { opacity: 0.38; cursor: default; transform: none; }
 
-  .restart-btn {
-    width: 100%;
-    padding: 13px;
-    background: transparent;
-    color: var(--muted);
-    border: 1.5px solid var(--border);
-    border-radius: 14px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: all 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
+  .restart-btn { width: 100%; padding: 13px; background: transparent; color: var(--muted); border: 1.5px solid var(--border); border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; margin-top: 10px; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
   .restart-btn:hover { border-color: var(--orange); color: var(--orange); }
 
   .loading-state { text-align: center; padding: 48px 20px; }
-  .spinner {
-    width: 48px; height: 48px;
-    border: 3px solid var(--border);
-    border-top-color: var(--orange);
-    border-radius: 50%;
-    animation: spin 0.85s linear infinite;
-    margin: 0 auto 22px;
-  }
+  .spinner { width: 48px; height: 48px; border: 3px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.85s linear infinite; margin: 0 auto 22px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text {
-    font-family: 'Syne', sans-serif;
-    font-size: 17px; font-weight: 700;
-    color: var(--text); margin-bottom: 7px;
-  }
+  .loading-text { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 7px; }
   .loading-sub { font-size: 13px; color: var(--muted); }
 
-  .results-header {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px; font-weight: 800;
-    color: var(--text); margin-bottom: 4px;
-  }
+  .results-header { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
   .results-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
 
-  .result-card {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 12px;
-  }
-  .result-card.top {
-    border-color: var(--orange);
-    background: rgba(255,107,53,0.04);
-  }
+  .result-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+  .result-card.top { border-color: var(--orange); background: rgba(255,107,53,0.04); }
   .result-header { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
   .result-icon { font-size: 28px; line-height: 1; flex-shrink: 0; }
-  .result-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 15px; font-weight: 700;
-    color: var(--text); line-height: 1.2;
-    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-  }
-  .top-badge {
-    background: var(--orange); color: #fff;
-    font-size: 10px; font-weight: 700;
-    padding: 2px 7px; border-radius: 5px; letter-spacing: 0.5px;
-  }
+  .result-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .top-badge { background: var(--orange); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 5px; letter-spacing: 0.5px; }
   .result-type { font-size: 12px; color: var(--muted); margin-top: 2px; }
   .stars { display: flex; align-items: center; gap: 2px; margin-top: 4px; }
   .star { color: var(--yellow); font-size: 13px; }
@@ -260,30 +107,11 @@
   .star-num { font-size: 12px; font-weight: 500; color: var(--muted); margin-left: 3px; }
   .result-desc { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 10px; }
   .result-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-  .tag {
-    font-size: 11px;
-    background: var(--tag-bg);
-    border: 1px solid var(--tag-border);
-    color: var(--tag-text);
-    padding: 3px 9px; border-radius: 20px; font-weight: 500;
-  }
+  .tag { font-size: 11px; background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 3px 9px; border-radius: 20px; font-weight: 500; }
 
-  .error-box {
-    background: var(--error-bg);
-    border: 1.5px solid var(--error-border);
-    color: var(--error-text);
-    border-radius: 14px; padding: 16px;
-    font-size: 14px; line-height: 1.5;
-    margin-bottom: 12px;
-  }
+  .error-box { background: var(--error-bg); border: 1.5px solid var(--error-border); color: var(--error-text); border-radius: 14px; padding: 16px; font-size: 14px; line-height: 1.5; margin-bottom: 12px; }
 
-  .footer {
-    text-align: center;
-    padding: 20px 24px 28px;
-    font-size: 11px;
-    color: var(--muted);
-    flex-shrink: 0;
-  }
+  .footer { text-align: center; padding: 20px 24px 28px; font-size: 11px; color: var(--muted); flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -299,6 +127,7 @@
       <div class="progress-fill" id="progressFill"></div>
     </div>
 
+    <!-- PASSO 1: HUMOR -->
     <div class="step active" id="step1">
       <div class="step-label">Passo 1 de 3</div>
       <div class="question">Como você está se sentindo agora?</div>
@@ -321,10 +150,17 @@
         <button class="opt-btn" onclick="select(this,'humor','entediado e precisando de novidade')">
           <span class="opt-icon">✨</span><span class="opt-label">Entediado</span>
         </button>
+        <button class="opt-btn" onclick="select(this,'humor','exausto e sem energia')">
+          <span class="opt-icon">😴</span><span class="opt-label">Exausto</span>
+        </button>
+        <button class="opt-btn" onclick="select(this,'humor','amargo e frustrado')">
+          <span class="opt-icon">😤</span><span class="opt-label">Amargo</span>
+        </button>
       </div>
       <button class="next-btn" id="next1" onclick="goStep(2)" disabled>Próximo →</button>
     </div>
 
+    <!-- PASSO 2: SENTIR -->
     <div class="step" id="step2">
       <div class="step-label">Passo 2 de 3</div>
       <div class="question">Como quer se sentir depois?</div>
@@ -351,6 +187,7 @@
       <button class="next-btn" id="next2" onclick="goStep(3)" disabled>Próximo →</button>
     </div>
 
+    <!-- PASSO 3: ATIVIDADES -->
     <div class="step" id="step3">
       <div class="step-label">Passo 3 de 3</div>
       <div class="question">Que tipo de programa te chama atenção?</div>
@@ -379,20 +216,25 @@
         <button class="opt-btn" onclick="toggleAct(this,'gastronomia e restaurantes')">
           <span class="opt-icon">🍽️</span><span class="opt-label">Gastronomia</span>
         </button>
+        <button class="opt-btn" onclick="toggleAct(this,'esportes e atividade física')">
+          <span class="opt-icon">⚽</span><span class="opt-label">Esportes</span>
+        </button>
       </div>
       <button class="next-btn" id="next3" onclick="buscar()" disabled>
         Buscar melhores lugares ✦
       </button>
     </div>
 
+    <!-- LOADING -->
     <div class="step" id="stepLoading">
       <div class="loading-state">
         <div class="spinner"></div>
         <div class="loading-text" id="loadingText">Consultando a IA...</div>
-        <div class="loading-sub" id="loadingSub">Buscando avaliações e recomendações em Fortaleza</div>
+        <div class="loading-sub" id="loadingSub">Buscando eventos e recomendações em Fortaleza</div>
       </div>
     </div>
 
+    <!-- RESULTADOS -->
     <div class="step" id="stepResults">
       <div class="results-header" id="resultsTitle">Top lugares para você hoje</div>
       <div class="results-sub" id="resultsSub">Baseado no seu perfil e dados da internet</div>
@@ -437,8 +279,8 @@ function toggleAct(btn, value) {
 
 const loadMsgs = [
   ['Analisando seu perfil...', 'Cruzando humor com lugares em Fortaleza'],
-  ['Buscando avaliações do Google...', 'Verificando notas e comentários recentes'],
-  ['Consultando recomendações...', 'Lendo posts e menções sobre Fortaleza'],
+  ['Buscando eventos da semana...', 'Verificando agenda e atrações atuais'],
+  ['Consultando recomendações...', 'Lendo avaliações e notas do Google'],
   ['Quase lá!', 'Montando sua lista personalizada']
 ];
 let loadIdx = 0, loadTimer = null;
