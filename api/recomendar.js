@@ -1,146 +1,77 @@
 export default async function handler(req, res) {
-  // ===== CORS =====
   res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({
-      error: 'Método não permitido'
-    });
-  }
-
-  // ===== BODY =====
   const { humor, sentir, activities } = req.body || {};
-
   if (!humor || !sentir || !Array.isArray(activities) || activities.length === 0) {
-    return res.status(400).json({
-      error: 'Dados incompletos'
-    });
+    return res.status(400).json({ error: 'Dados incompletos' });
   }
 
-  // ===== API KEY =====
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY não configurada' });
 
-  if (!apiKey) {
-    return res.status(500).json({
-      error: 'GEMINI_API_KEY não configurada'
-    });
-  }
-
-  // ===== PROMPT =====
-  const prompt = `
-Você é um especialista em lazer e entretenimento em Fortaleza, Ceará, Brasil.
+  const prompt = `Você é um especialista em lazer e entretenimento em Fortaleza, Ceará, Brasil.
 
 Perfil do usuário:
 - Humor atual: ${humor}
 - Como quer se sentir: ${sentir}
 - Atividades de interesse: ${activities.join(', ')}
 
-Liste OS 4 MELHORES lugares reais em Fortaleza que combinem com esse perfil.
+Liste os 4 MELHORES lugares reais e eventos atuais em Fortaleza que combinem com esse perfil. Inclua bares, praias, shows, restaurantes, festas e atrações da cidade.
 
-Responda SOMENTE com JSON válido:
+Responda SOMENTE com JSON válido, sem texto antes ou depois, sem blocos de código:
 {
   "titulo": "frase curta (máx 6 palavras)",
   "subtitulo": "frase curta contextual",
   "lugares": [
     {
-      "nome": "Nome real do lugar",
+      "nome": "Nome real do lugar em Fortaleza",
       "tipo": "Categoria",
       "icone": "emoji",
       "nota": 4.6,
-      "descricao": "2 frases explicativas.",
-      "tags": ["tag1","tag2"],
+      "descricao": "2 frases explicativas sobre o lugar e por que combina com o perfil.",
+      "tags": ["tag1","tag2","tag3"],
       "destaque": true
     }
   ]
 }
-
-Apenas o primeiro lugar tem destaque true.
-`;
+Apenas o primeiro lugar tem destaque true, os demais false.`;
 
   try {
-    // ===== REQUEST GEMINI =====
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 1200
-          }
-        })
-      }
-    );
-
-    const rawResponseText = await response.text();
-
-    console.log('========== GEMINI DEBUG ==========');
-    console.log('STATUS:', response.status);
-    console.log('BODY:', rawResponseText);
-    console.log('==================================');
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 1200
+      })
+    });
 
     if (!response.ok) {
-      return res.status(response.status).json({
-        error: rawResponseText
-      });
+      const err = await response.json().catch(() => ({}));
+      return res.status(response.status).json({ error: err.error?.message || 'Erro na API do Groq' });
     }
 
-    const responseData = JSON.parse(rawResponseText);
+    const data = await response.json();
+    const raw = data.choices?.[0]?.message?.content || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const s = clean.indexOf('{');
+    const e = clean.lastIndexOf('}');
+    if (s === -1) return res.status(500).json({ error: 'Formato de resposta inválido' });
 
-    const rawText =
-      responseData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    if (!rawText) {
-      return res.status(500).json({
-        error: 'Resposta vazia da IA'
-      });
-    }
-
-    // ===== CLEAN JSON =====
-    const cleaned = rawText
-      .replace(/```json/gi, '')
-      .replace(/```/g, '')
-      .trim();
-
-    const jsonStart = cleaned.indexOf('{');
-    const jsonEnd = cleaned.lastIndexOf('}');
-
-    if (jsonStart === -1 || jsonEnd === -1) {
-      return res.status(500).json({
-        error: 'A IA retornou JSON inválido',
-        raw: cleaned
-      });
-    }
-
-    const parsed = JSON.parse(
-      cleaned.slice(jsonStart, jsonEnd + 1)
-    );
-
-    return res.status(200).json(parsed);
-
+    const result = JSON.parse(clean.slice(s, e + 1));
+    return res.status(200).json(result);
   } catch (err) {
-    console.error('ERRO INTERNO:', err);
-
-    return res.status(500).json({
-      error: err.message || 'Erro interno no servidor'
-    });
+    console.error(err);
+    return res.status(500).json({ error: err.message || 'Erro interno no servidor' });
   }
 }
