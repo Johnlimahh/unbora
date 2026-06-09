@@ -18,19 +18,18 @@ export default async function handler(req, res) {
   const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const mesAno = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
-  // Múltiplas buscas focadas em Fortaleza
   let contextoReal = '';
   if (braveKey) {
     try {
       const queries = [
-        `site:opovo.com.br OR site:diariodonordeste.com.br eventos agenda Fortaleza ${mesAno}`,
-        `eventos shows festas Fortaleza Ceará ${mesAno} site:instagram.com OR site:sympla.com.br`,
-        `agenda cultural ${activities.join(' ')} Fortaleza ${mesAno}`,
-        `bares restaurantes baladas Fortaleza melhores avaliados 2025`
+        `agenda eventos Fortaleza ${mesAno} ${activities.join(' ')}`,
+        `site:opovo.com.br OR site:diariodonordeste.com.br agenda Fortaleza ${mesAno}`,
+        `site:sympla.com.br eventos Fortaleza ${mesAno}`,
+        `shows festas baladas bares Fortaleza ${mesAno} novidades`
       ];
 
       const buscas = await Promise.all(queries.map(q =>
-        fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(q)}&count=5&lang=pt&country=BR`, {
+        fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(q)}&count=5&lang=pt&country=BR&freshness=pm`, {
           headers: { 'Accept': 'application/json', 'X-Subscription-Token': braveKey }
         }).then(r => r.ok ? r.json() : null).catch(() => null)
       ));
@@ -38,46 +37,51 @@ export default async function handler(req, res) {
       const resultados = buscas
         .filter(Boolean)
         .flatMap(b => b.web?.results || [])
-        .slice(0, 12)
-        .map(r => `- ${r.title}: ${r.description} (${r.url})`)
-        .join('\n');
+        .slice(0, 15)
+        .map(r => `FONTE: ${r.url}\nTÍTULO: ${r.title}\nDESCRIÇÃO: ${r.description}`)
+        .join('\n---\n');
 
-      if (resultados) {
-        contextoReal = `\n\nDADOS REAIS COLETADOS DA INTERNET AGORA:\n${resultados}\n\nUSE APENAS LUGARES E EVENTOS QUE APARECEM NESSES DADOS ACIMA. Se não tiver informação suficiente, use apenas lugares REAIS e CONHECIDOS de Fortaleza-CE.`;
-      }
+      if (resultados) contextoReal = `\n\n=== DADOS REAIS DA INTERNET ===\n${resultados}\n=== FIM DOS DADOS ===`;
     } catch (e) {
       console.error('Brave error:', e);
     }
   }
 
-  const prompt = `Você é um guia local especialista em Fortaleza, Ceará, Brasil. Hoje é ${hoje}.
+  const prompt = `Você é um guia local ESPECIALISTA em Fortaleza, Ceará, Brasil. Conhece cada bairro, bar, restaurante, praia, show e evento da cidade profundamente.
 
-Perfil do usuário:
-- Humor: ${humor}
-- Quer se sentir: ${sentir}  
-- Interesses: ${activities.join(', ')}
+Hoje é ${hoje}.
+
+PERFIL DO USUÁRIO:
+- Humor atual: ${humor}
+- Como quer se sentir depois: ${sentir}
+- Tipo de programa desejado: ${activities.join(', ')}
 ${contextoReal}
 
-REGRAS OBRIGATÓRIAS:
-1. SOMENTE lugares e eventos em Fortaleza-CE, Brasil
-2. Use NOMES REAIS e COMPLETOS dos estabelecimentos (ex: "Mercado dos Pinhões", "Praia do Futuro", "Beach Park", "Aterrinho da Praia de Iracema")
-3. Se encontrou eventos reais nos dados acima, priorize-os
-4. Notas baseadas em avaliações reais do Google Maps
-5. Tags específicas e úteis (bairro, faixa de preço, horário)
-6. NUNCA invente lugares que não existem em Fortaleza
+SUA TAREFA:
+Indique 4 lugares ou eventos COMPLETAMENTE DIFERENTES entre si, altamente específicos para Fortaleza-CE, que combinem DIRETAMENTE com o humor "${humor}" e o desejo de se sentir "${sentir}".
 
-Responda SOMENTE com JSON válido, sem texto antes ou depois:
+REGRAS ABSOLUTAS:
+1. TODOS os lugares devem ser em Fortaleza-CE — nenhuma exceção
+2. Use nomes REAIS e COMPLETOS: "Boteco Praia — Av. Beira Mar", "Chopão da Aldeota", "Cineteatro São Luiz", "Mercado dos Pinhões — Centro", "Club 26 — Varjota", etc
+3. Cada lugar deve ser de uma CATEGORIA DIFERENTE — não repita tipos
+4. A escolha do lugar deve fazer sentido DIRETO com o humor: se está amargo, sugira lugares para desabafar ou distrair; se está exausto, lugares calmos; se está animado, lugares agitados
+5. Varie os BAIRROS: Meireles, Aldeota, Varjota, Praia de Iracema, Mucuripe, Benfica, Centro, Messejana, etc
+6. Se encontrou eventos reais nos dados da internet, USE-OS e cite datas reais
+7. NUNCA repita os mesmos lugares em respostas diferentes — explore toda a cidade
+8. Notas baseadas em avaliações reais do Google Maps
+
+Responda SOMENTE com JSON válido, sem texto antes ou depois, sem blocos de código markdown:
 {
-  "titulo": "frase curta personalizada (máx 6 palavras)",
-  "subtitulo": "frase com contexto do dia/período",
+  "titulo": "frase criativa e personalizada com o humor (máx 6 palavras)",
+  "subtitulo": "frase com o dia da semana e contexto",
   "lugares": [
     {
-      "nome": "Nome real e completo do lugar em Fortaleza",
-      "tipo": "categoria específica (ex: Bar na Praia, Show de Forró, Restaurante Cearense)",
-      "icone": "emoji",
-      "nota": 4.6,
-      "descricao": "2 frases específicas: o que é o lugar/evento + por que combina com o perfil do usuário.",
-      "tags": ["bairro ou endereço", "faixa de preço", "horário ou dia"],
+      "nome": "Nome completo real do lugar + bairro se necessário",
+      "tipo": "categoria bem específica (ex: Bar de Praia, Forró Pé de Serra, Restaurante Cearense, Cinema de Shopping)",
+      "icone": "emoji que representa bem o lugar",
+      "nota": 4.3,
+      "descricao": "Frase 1: o que torna esse lugar único e especial em Fortaleza. Frase 2: por que combina ESPECIFICAMENTE com quem está ${humor} e quer se sentir ${sentir}.",
+      "tags": ["Bairro específico", "R$ faixa de preço", "horário ou dia de funcionamento"],
       "destaque": true
     }
   ]
@@ -90,9 +94,15 @@ Apenas o primeiro lugar tem destaque true, os demais false.`;
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${groqKey}` },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.4,
-        max_tokens: 1500
+        messages: [
+          {
+            role: 'system',
+            content: 'Você é um especialista local em Fortaleza-CE. Conhece profundamente todos os bares, restaurantes, praias, shows, eventos e atrações da cidade. Sempre indica lugares REAIS com nomes completos e corretos. Nunca repete os mesmos lugares. Varia sempre os bairros e categorias.'
+          },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.9,
+        max_tokens: 1800
       })
     });
 
