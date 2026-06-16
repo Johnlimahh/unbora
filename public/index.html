@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Fortaleza Divertida</title>
+<title>Unbora</title>
 <meta name="description" content="Descubra o que fazer hoje em Fortaleza com recomendações personalizadas por IA."/>
-<meta property="og:title" content="Fortaleza Divertida"/>
+<meta property="og:title" content="Unbora"/>
 <meta property="og:description" content="O que fazer hoje na cidade? A IA te indica os melhores lugares."/>
 <meta property="og:type" content="website"/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌴</text></svg>"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Fortaleza Divertida"/>
+<meta name="apple-mobile-web-app-title" content="Unbora"/>
 <meta name="theme-color" content="#FF6B35"/>
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23FF6B35'/><text y='.9em' font-size='75' x='10'>🌴</text></svg>"/>
 <link rel="manifest" href="/manifest.json"/>
@@ -124,7 +124,7 @@
 <div class="app">
 
   <div class="header">
-    <div class="logo">Fortaleza <span>Divertida</span></div>
+    <div class="logo">Un<span>bora</span></div>
     <div class="tagline">O que fazer hoje na cidade?</div>
   </div>
 
@@ -353,7 +353,7 @@ function renderResults(data) {
         </div>
       </div>
       <div class="result-desc">${l.descricao}</div>
-      <div class="result-tags">${(l.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      <div class="result-tags">${(l.tags || []).join('').split('').length > 0 ? (l.tags || []).map(t => `<span class="tag">${t}</span>`).join('') : ''}</div>
     </div>`).join('');
 
   document.getElementById('resultsList').innerHTML = html;
