@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     'reggae': 'reggae clubs, festas de reggae, bares com reggae ao vivo em Fortaleza',
     'gastronomia e restaurantes': 'restaurantes, botecos, food parks como Mercado dos Pinhões, Beco da Poeira, Coco Bambu, restaurantes da Varjota e Aldeota',
     'cinema e filmes': 'cinemas, cinematecas como Cineteatro São Luiz, UCI, Cinépolis, Cinemark Shopping',
-    'teatro': 'teatros, espetáculos, peças como Teatro José de Alencar, Cineteatro São Luiz, Teatro Celina Queiroz, Teatro Carlos Câmara',
+    'teatro': 'teatros, espetáculos, peças como Teatro José de Alencar,Shopping Benfica, Cineteatro São Luiz, Teatro Celina Queiroz, Teatro Carlos Câmara',
     'esportes e atividade física': 'quadras, campos, esportes na praia, circuitos de corrida, academia ao ar livre',
     'parque de diversões': 'parques, atrações família como Beach Park, Parque Rio Branco, Parque do Cocó',
     'kart e velocidade': 'kartódromos em Fortaleza',
